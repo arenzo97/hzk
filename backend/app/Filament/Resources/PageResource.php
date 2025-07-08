@@ -41,8 +41,8 @@ class PageResource extends Resource
                     ->unique(ignoreRecord: true),
                 RichEditor::make('content')
                     ->label('Page Content')
-                    ->required(),
-
+                    ->fileAttachmentsDirectory('pages')
+                    ->fileAttachmentsDisk('public'),
                 ToggleButtons::make('published')
                     ->label('Status')
                     ->boolean()

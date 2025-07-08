@@ -19,12 +19,12 @@ services:
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
     container_name: jlwc-frontend
     ports:
       - "4321:4321"
     volumes:
       - ./frontend:/app
-    command: ["npm", "run", "dev", "--", "--host"]
     depends_on:
       - backend
 

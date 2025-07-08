@@ -1,53 +1,65 @@
 ---
+// src/pages/[slug].astro
 import BaseLayout from '../layouts/BaseLayout.astro';
 
+// Define the API URL for getStaticPaths (used during build time)
+// This must be a URL accessible from inside the Docker container at build time.
+const BUILD_TIME_API_URL = 'http://web:80/api/pages';
+
 export async function getStaticPaths() {
-  const API_URL = 'http://web:80/api/pages';
-
-  let pages = [];
   try {
-    const response = await fetch(API_URL);
-    if (response.ok) {
-      pages = await response.json();
-    } else {
-      console.error('Failed to fetch pages for static paths:', response.status, response.statusText);
-      return [];
+    const response = await fetch(BUILD_TIME_API_URL);
+    if (!response.ok) {
+      console.error('Failed to fetch pages for static paths during build:', response.status, response.statusText);
+      return []; // Return empty array to prevent build errors
     }
+    const pages = await response.json();
+
+    const paths = pages
+      .filter((page) => page.slug && typeof page.slug === 'string' && page.slug.trim() !== '')
+      .map((page) => ({
+        params: { slug: page.slug },
+        props: { initialPageData: page }, // Pass the page data as a prop
+      }));
+
+    console.log("Generated static paths (SSG fallback):", paths.map(p => p.params.slug)); // For debugging build
+    return paths;
+
   } catch (error) {
-    console.error('Error fetching pages for static paths:', error);
-    return [];
+    console.error('Error fetching pages for static paths during build:', error);
+    return []; // Return empty array on error
   }
-
-  const paths = pages
-    .filter((page) => page.slug && typeof page.slug === 'string' && page.slug.trim() !== '')
-    .map((page) => ({
-      params: { slug: page.slug },
-      props: { page },
-    }));
-
-  return paths;
 }
 
-const { page } = Astro.props;
+// Get the slug from the URL parameters (always available for a dynamic route)
+const { slug } = Astro.params;
+// Get the initial page data passed from getStaticPaths (if the page was built statically)
+const { initialPageData } = Astro.props;
 
-if (!page) {
-  return Astro.redirect('/404');
-}
+// Determine initial title for the layout (can be updated by client-side script)
+const pageTitle = initialPageData?.title || 'Loading Page...';
 
-const pageTitle = page.title || 'Page Not Found';
-const pageDescription = page.excerpt || (page.content ? page.content.substring(0, 150) + '...' : 'Content page from JLWC.');
+// Determine initial description (can be updated by client-side script)
+const pageDescription = initialPageData?.excerpt || (initialPageData?.content ? initialPageData.content.substring(0, 150) + '...' : 'Content page from JLWC.');
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription}>
-  <article class="bg-white rounded-xl shadow-lg border border-gray-100 p-8 mb-12">
-    <h1 class="text-4xl font-bold mb-6 text-blue-800 leading-snug">
-      {page.title}
-    </h1>
-    <div
-      class="prose prose-xl max-w-none text-gray-700 leading-relaxed"
-      set:html={page.content}
-    />
-  </article>
+  <div id="page-content-wrapper" class="min-h-[50vh] flex items-center justify-center">
+    {/* Display initialPageData if available (for statically built pages) */}
+    {initialPageData ? (
+      <article class="bg-white rounded-xl shadow-lg border border-gray-100 p-8 w-full max-w-4xl">
+        <h1 class="text-4xl font-bold mb-6 text-blue-800 leading-snug">
+          {initialPageData.title}
+        </h1>
+        <div
+          class="prose prose-xl max-w-none text-gray-700 leading-relaxed"
+          set:html={initialPageData.content}
+        />
+      </article>
+    ) : (
+      <p class="text-gray-600 text-lg">Loading content dynamically...</p>
+    )}
+  </div>
 
   <section class="text-center mt-12">
     <a href="/" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
@@ -55,4 +67,60 @@ const pageDescription = page.excerpt || (page.content ? page.content.substring(0
       Back to Home
     </a>
   </section>
+
+  <script define:vars={{ slug, initialPageDataExists: !!initialPageData }}>
+    // This script runs in the browser (client-side)
+    // The API_URL for client-side fetching needs to be accessible from the browser.
+    // Since your frontend is at localhost:4321 and backend at localhost:8000,
+    // the browser will directly hit localhost:8000.
+    const CLIENT_SIDE_API_BASE_URL = 'http://localhost:8000/api/pages';
+
+    async function fetchAndRenderPageContent(pageSlug) {
+      const pageContentWrapper = document.getElementById('page-content-wrapper');
+      if (!pageContentWrapper) return; // Exit if wrapper not found
+
+      // Show a loading state while fetching
+      pageContentWrapper.innerHTML = '<p class="text-gray-600 text-lg">Loading content dynamically...</p>';
+
+      try {
+        const response = await fetch(`${CLIENT_SIDE_API_BASE_URL}/${pageSlug}`);
+        if (!response.ok) {
+          if (response.status === 404) {
+            pageContentWrapper.innerHTML = '<p class="text-red-600 text-center text-xl">Page not found.</p>';
+            document.title = 'Page Not Found';
+          } else {
+            pageContentWrapper.innerHTML = '<p class="text-red-600 text-center text-xl">An error occurred loading this page.</p>';
+            document.title = 'Error Loading Page';
+          }
+          console.error(`Failed to fetch dynamic page content for slug: ${pageSlug}`, response.status, response.statusText);
+          return;
+        }
+
+        const pageData = await response.json();
+
+        // Render the fetched content
+        pageContentWrapper.innerHTML = `
+          <article class="bg-white rounded-xl shadow-lg border border-gray-100 p-8 w-full max-w-4xl">
+            <h1 class="text-4xl font-bold mb-6 text-blue-800 leading-snug">
+              ${pageData.title}
+            </h1>
+            <div class="prose prose-xl max-w-none text-gray-700 leading-relaxed">
+              ${pageData.content}
+            </div>
+          </article>
+        `;
+        document.title = pageData.title; // Update browser tab title
+      } catch (error) {
+        console.error('Error fetching dynamic page content:', error);
+        pageContentWrapper.innerHTML = '<p class="text-red-600 text-center text-xl">A network error occurred. Please try again.</p>';
+        document.title = 'Network Error';
+      }
+    }
+
+    // Only fetch client-side if initialPageData was NOT provided (i.e., this page wasn't built statically).
+    // This happens for new pages created after Astro's initial build during dev.
+    if (!initialPageDataExists) {
+      fetchAndRenderPageContent(slug);
+    }
+  </script>
 </BaseLayout>
