@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PageResource\Pages;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Tables\Columns\TextColumn;
 use App\Models\Page;
 use Filament\Forms;
@@ -43,8 +43,14 @@ class PageResource extends Resource
                     ->label('Page Content')
                     ->required(),
 
-                Toggle::make('published')
-                    ->label('Published')
+                ToggleButtons::make('published')
+                    ->label('Status')
+                    ->boolean()
+                    ->grouped()
+                    ->options([
+                        false => 'Draft',
+                        true => 'Published'
+                    ])
                     ->default(false),
             ]);
     }
