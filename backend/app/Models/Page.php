@@ -13,14 +13,35 @@ class Page extends Model
     protected $fillable = [
         'title',
         'user_id',
+        'sort',
         'slug',
         'content',
+        'homepage',
         'published',
     ];
 
     protected $casts = [
+        'homepage'  => 'boolean',
         'published' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function ($page) {
+            if (is_null($page->sort)) {
+                $page->sort = Page::max('sort') + 1;
+            }
+        });
+
+        static::saving(function (Page $page) {
+            if ($page->homepage) {
+                
+                Page::where('homepage', true)
+                    ->where('id', '!=', $page->id)
+                    ->update(['homepage' => false]);
+            }
+        });
+    }
 
     public function author()
     {

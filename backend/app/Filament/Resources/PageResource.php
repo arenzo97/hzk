@@ -43,6 +43,15 @@ class PageResource extends Resource
                     ->label('Page Content')
                     ->fileAttachmentsDirectory('pages')
                     ->fileAttachmentsDisk('public'),
+                ToggleButtons::make('homepage')
+                    ->label('Homepage')
+                    ->boolean()
+                    ->grouped()
+                    ->options([
+                        false => 'No',
+                        true => 'Yes'
+                    ])
+                    ->default(false),
                 ToggleButtons::make('published')
                     ->label('Status')
                     ->boolean()
@@ -55,10 +64,11 @@ class PageResource extends Resource
             ]);
     }
 
-
     public static function table(Table $table): Table
     {
         return $table
+            ->reorderable('sort')
+            ->defaultSort('sort')
             ->columns([
                 TextColumn::make('title')->label('Title')->searchable(),
                 TextColumn::make('slug')->label('Slug')->searchable(),
