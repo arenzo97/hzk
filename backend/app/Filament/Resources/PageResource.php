@@ -16,6 +16,7 @@ use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Filament\Tables\Columns\Layout\Stack;
 
 class PageResource extends Resource
 {
@@ -64,12 +65,20 @@ class PageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+      public static function table(Table $table): Table
     {
         return $table
             ->reorderable('sort')
             ->defaultSort('sort')
             ->columns([
+                IconColumn::make('homepage')
+                    ->label(false)
+                    ->boolean()
+                    ->trueIcon('heroicon-o-star')
+                    ->falseIcon(false)
+                    ->trueColor('warning')
+                    ->width('w-8')
+                    ->extraAttributes(['class' => 'text-center']),
                 TextColumn::make('title')->label('Title')->searchable(),
                 TextColumn::make('slug')->label('Slug')->searchable(),
                 TextColumn::make('author.name')
@@ -78,7 +87,12 @@ class PageResource extends Resource
                     ->searchable(),
                 IconColumn::make('published')
                     ->label('Published')
-                    ->boolean(),
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->tooltip(fn (bool $state) => $state ? 'Published' : 'Draft'),
                 TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M j, Y H:i'),
@@ -96,7 +110,6 @@ class PageResource extends Resource
                 ]),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [

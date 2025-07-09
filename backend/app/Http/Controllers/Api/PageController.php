@@ -11,8 +11,8 @@ class PageController extends Controller
     public function index()
     {
         return Page::where('published', true)
-            ->with('author:id,name') // include author info
-            ->latest()
+            ->with('author:id,name') // Include author info
+            ->orderBy('sort')
             ->get();
     }
 
