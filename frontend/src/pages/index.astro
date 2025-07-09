@@ -1,22 +1,73 @@
 ---
 // src/pages/index.astro
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Define the API URL. This should be accessible from the Astro server/build environment.
+// Since your backend is 'web' in Docker, and Astro runs inside Docker during dev/build,
+// 'http://web:80/api/pages' is the correct internal Docker network URL.
+const API_URL = 'http://web:80/api/pages';
+
+let homepageContent = null;
+let homepageTitle = "Welcome to JLWC"; // Default title
+
+try {
+  // Fetch all pages from your backend API
+  const response = await fetch(API_URL);
+
+  if (response.ok) {
+    const pages = await response.json();
+    // Find the page where 'homepage' is true
+    const homepagePage = pages.find(page => page.homepage === true);
+
+    if (homepagePage) {
+      // If a homepage is found, use its content and title
+      homepageContent = homepagePage.content;
+      homepageTitle = homepagePage.title;
+    } else {
+      // If no page is marked as homepage, you can set a default message
+      homepageContent = '<p class="text-center text-xl text-gray-700">No page is currently set as the homepage. Please designate one in the admin panel.</p>';
+      homepageTitle = "No Homepage Set";
+    }
+  } else {
+    // Handle API fetch errors
+    console.error(`Failed to fetch pages for index.astro: ${response.status} ${response.statusText}`);
+    homepageContent = '<p class="text-center text-red-500 text-xl">Could not load homepage content. Please try again later.</p>';
+    homepageTitle = "Error Loading Content";
+  }
+} catch (error) {
+  // Handle network or other fetch errors
+  console.error('Error fetching homepage content:', error);
+  homepageContent = '<p class="text-center text-red-500 text-xl">A network error occurred. Please check the backend connection.</p>';
+  homepageTitle = "Network Error";
+}
 ---
 
-<BaseLayout title="Welcome to JLWC">
-  <section class="text-center py-16 px-4 bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-xl shadow-lg mb-12">
-    <h1 class="text-6xl font-extrabold leading-tight mb-6 animate-fade-in-down">
-      Welcome to JLWC Pages
-    </h1>
-    <p class="text-xl opacity-90 mb-8 animate-fade-in delay-200">
-      Explore our content through the navigation above.
-    </p>
-    <a href="/about" class="inline-block bg-white text-blue-700 hover:bg-blue-100 px-8 py-3 rounded-full text-lg font-semibold shadow-lg transition-transform transform hover:scale-105 animate-fade-in delay-400">
-      Learn More
-    </a>
-  </section>
+<BaseLayout title={homepageTitle}>
+  {homepageContent ? (
+    <article class="bg-white rounded-xl shadow-lg border border-gray-100 p-8 mb-12">
+      <h1 class="text-4xl font-bold mb-6 text-blue-800 leading-snug">
+        {homepageTitle}
+      </h1>
+      <div
+        class="prose prose-xl max-w-none text-gray-700 leading-relaxed"
+        set:html={homepageContent}
+      />
+    </article>
+  ) : (
+    <section class="text-center py-16 px-4 bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-xl shadow-lg mb-12">
+      <h1 class="text-6xl font-extrabold leading-tight mb-6 animate-fade-in-down">
+        {homepageTitle}
+      </h1>
+      <p class="text-xl opacity-90 mb-8 animate-fade-in delay-200">
+        {homepageContent || "Explore our content through the navigation above."}
+      </p>
+      <a href="/about" class="inline-block bg-white text-blue-700 hover:bg-blue-100 px-8 py-3 rounded-full text-lg font-semibold shadow-lg transition-transform transform hover:scale-105 animate-fade-in delay-400">
+        Learn More
+      </a>
+    </section>
+  )}
 
-  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
     <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
       <h3 class="text-xl font-semibold text-blue-700 mb-3">Dynamic Content</h3>
       <p class="text-gray-700">All pages fetched from the backend are dynamically displayed.</p>

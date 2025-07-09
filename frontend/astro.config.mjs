@@ -1,15 +1,14 @@
-// @ts-check
 import { defineConfig } from 'astro/config';
 import node from '@astrojs/node';
-
-// https://astro.build/config
+import tailwind from '@astrojs/tailwind';
 export default defineConfig({
   output: 'server',
   adapter: node({
-    mode: 'standalone' // or 'middleware'
+    mode: 'standalone'
   }),
   server: {
     host: true,
     port: 4321,
   },
+  integrations: [tailwind()],
 });

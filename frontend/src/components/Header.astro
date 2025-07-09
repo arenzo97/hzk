@@ -1,5 +1,4 @@
 ---
-// src/components/Header.astro
 const API_URL = 'http://web:80/api/pages';
 
 let pages = [];
@@ -8,14 +7,11 @@ try {
   if (response.ok) {
     pages = await response.json();
   } else {
-    console.error('Failed to fetch pages:', response.status, response.statusText);
+    console.error('Failed to fetch pages for navigation:', response.status, response.statusText);
   }
 } catch (error) {
-  console.error('Error fetching pages:', error);
+  console.error('Error fetching pages for navigation:', error);
 }
-
-// Basic sorting by title or ID, adjust as needed
-pages.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
 ---
 
 <header class="bg-blue-800 text-white shadow-md">
@@ -24,15 +20,17 @@ pages.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
       <a href="/" class="text-3xl font-extrabold tracking-tight hover:text-blue-200 transition-colors duration-200">
         JLWC
       </a>
-      </div>
+    </div>
 
     <div class="w-full sm:w-auto">
       {pages.length > 0 ? (
         <ul class="flex flex-col sm:flex-row sm:space-x-8 space-y-3 sm:space-y-0 text-lg font-medium">
-          {pages.map((page) => (
+          {pages
+            .filter(page => page.homepage !== true) // <--- ADDED THIS LINE
+            .map((page) => (
             <li>
               <a
-  				href={`/${page.slug}`}
+                href={`/${page.slug}`}
                 class="block py-2 px-3 rounded-lg hover:bg-blue-700 hover:text-blue-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 {page.title}
