@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+/** @type {import('tailwindcss/types/config').Config} */
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,ts,tsx}'],
   theme: {
@@ -11,8 +11,8 @@ export default {
         'dark': '#4b1d3fff',          // Violet JTC - Dark backgrounds, main text color, headers/footers
       },
       fontFamily: {
-        sans: ['"Source Sans Pro"', 'sans-serif'],
-        serif: ['"Playfair Display"', 'serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        sans: ['"Source Sans Pro"', 'system-ui', 'sans-serif'],
       },
     },
   },

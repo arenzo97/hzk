@@ -19,9 +19,14 @@ const { title = 'JLWC Church', description = 'A welcoming church community.', } 
   <meta name="generator" content={Astro.generator} />
   <title>{title}</title>
   <meta name="description" content={description} />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="/styles.css"> 
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col font-sans"> {/* Apply font-sans globally */}
   <Header />
 
   <main class="flex-grow">
