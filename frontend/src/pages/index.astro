@@ -69,7 +69,7 @@ try {
     class="relative py-32 md:py-48 bg-cover bg-center text-white flex items-center justify-center overflow-hidden"
     style={`background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${homepageImage || '/uploads/hero-bg.webp'}')`}
   >
-    <div class="absolute inset-0 bg-blue-900 opacity-20 -z-10"></div>
+    <div class="absolute inset-0 bg-dark opacity-20 -z-10"></div>
     <div class="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
       <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4 animate-fade-in-down">
         {homepageTitle}
@@ -88,7 +88,7 @@ try {
             href={secondaryCtaLink}
             variant="outline"
             size="lg"
-            class="bg-white/10 text-white border-white hover:bg-white hover:text-gray-900 backdrop-blur-sm"
+            class="bg-white/10 text-secondary border-secondary hover:bg-secondary hover:text-white backdrop-blur-sm"
           >
             {secondaryCtaText}
           </Button>
@@ -97,16 +97,16 @@ try {
     </div>
   </section>
 
-  <section class="py-16 bg-white">
+  <section class="py-16">
     <Container>
       {homepageContent ? (
         <article class="max-w-4xl mx-auto">
-          <div class="prose prose-xl max-w-none text-gray-700 leading-relaxed card p-8">
+          <div class="prose prose-xl max-w-none text-dark leading-relaxed card p-8">
             <Fragment set:html={homepageContent} />
           </div>
         </article>
       ) : (
-        <p class="text-center text-gray-600 text-lg">No content to display for the homepage.</p>
+        <p class="text-center text-primary text-lg">No content to display for the homepage.</p>
       )}
     </Container>
   </section>
