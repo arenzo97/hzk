@@ -1,0 +1,35 @@
+---
+// src/components/UI/Button.astro
+interface Props {
+  href: string;
+  variant?: 'primary' | 'secondary' | 'accent' | 'outline'; // Added accent variant
+  size?: 'sm' | 'md' | 'lg';
+  class?: string; // For adding extra classes from the parent
+}
+
+const { href, variant = 'primary', size = 'md', class: additionalClasses } = Astro.props;
+
+// Map size prop to Tailwind padding/font size classes
+let sizeClasses = '';
+switch (size) {
+  case 'sm':
+    sizeClasses = 'px-4 py-2 text-sm'; // Adjust these to match your design if needed
+    break;
+  case 'lg':
+    sizeClasses = 'px-8 py-4 text-lg'; // Adjust these to match your design if needed
+    break;
+  case 'md':
+  default:
+    sizeClasses = 'px-6 py-3 text-base'; // Adjust these to match your design if needed
+    break;
+}
+
+// Your global CSS defines .btn, .btn-primary, .btn-outline etc.
+// We'll use those directly.
+const variantClass = `btn-${variant}`;
+const allClasses = `btn ${variantClass} ${sizeClasses} ${additionalClasses || ''}`;
+---
+
+<a href={href} class={allClasses}>
+  <slot />
+</a>

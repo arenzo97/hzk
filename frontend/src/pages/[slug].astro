@@ -1,5 +1,8 @@
 ---
+// src/pages/[slug].astro
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/Layout/Container.astro'; // Make sure this path is correct
+import Button from '../components/UI/Button.astro'; // <--- ADD THIS LINE
 
 const BUILD_TIME_API_URL = 'http://web:80/api/pages';
 
@@ -29,39 +32,43 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const { initialPageData } = Astro.props;
 
+const CLIENT_SIDE_API_BASE_URL = 'http://localhost:8000/api/pages';
+
 const pageTitle = initialPageData?.title || 'Loading Page...';
 const pageDescription = initialPageData?.excerpt || (initialPageData?.content ? initialPageData.content.substring(0, 150) + '...' : 'Content page from JLWC.');
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription}>
-  <div id="page-content-wrapper" class="min-h-[50vh] flex items-center justify-center">
-    {initialPageData ? (
-      <article class="bg-white rounded-xl shadow-lg border border-gray-100 p-8 w-full max-w-4xl">
-        <h1 class="text-4xl font-bold mb-6 text-blue-800 leading-snug">
-          {initialPageData.title}
-        </h1>
-        <div class="prose prose-xl max-w-none text-gray-700 leading-relaxed" set:html={initialPageData.content} />
-      </article>
-    ) : (
-      <p class="text-gray-600 text-lg">Loading content dynamically...</p>
-    )}
+  <div id="page-content-wrapper" class="py-12 px-4 sm:px-6 lg:px-8 min-h-[50vh] flex items-center justify-center">
+    <Container>
+      {initialPageData ? (
+        <article class="w-full max-w-4xl mx-auto card p-8">
+          <h1 class="text-center mb-6">
+            {initialPageData.title}
+          </h1>
+          <div class="prose prose-xl max-w-none text-gray-700 leading-relaxed">
+            <Fragment set:html={initialPageData.content} />
+          </div>
+        </article>
+      ) : (
+        <p class="text-gray-600 text-lg text-center">Loading content dynamically...</p>
+      )}
+    </Container>
   </div>
 
   <section class="text-center mt-12">
-    <a href="/" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+    <Button href="/" variant="outline">
       <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H16a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
       Back to Home
-    </a>
+    </Button>
   </section>
 
-  <script define:vars={{ slug, initialPageDataExists: !!initialPageData }}>
-    const CLIENT_SIDE_API_BASE_URL = 'http://localhost:8000/api/pages';
-
+  <script define:vars={{ slug, initialPageDataExists: !!initialPageData, CLIENT_SIDE_API_BASE_URL }}>
     async function fetchAndRenderPageContent(pageSlug) {
       const pageContentWrapper = document.getElementById('page-content-wrapper');
       if (!pageContentWrapper) return;
 
-      pageContentWrapper.innerHTML = '<p class="text-gray-600 text-lg">Loading content dynamically...</p>';
+      pageContentWrapper.innerHTML = '<p class="text-gray-600 text-lg text-center">Loading content dynamically...</p>';
 
       try {
         const response = await fetch(`${CLIENT_SIDE_API_BASE_URL}/${pageSlug}`);
@@ -77,19 +84,19 @@ const pageDescription = initialPageData?.excerpt || (initialPageData?.content ? 
         const pageData = await response.json();
         document.title = pageData.title;
 
-        const htmlWrapper = document.createElement('div');
-        htmlWrapper.className = 'prose prose-xl max-w-none text-gray-700 leading-relaxed';
-        htmlWrapper.innerHTML = pageData.content;
-
         const article = document.createElement('article');
-        article.className = 'bg-white rounded-xl shadow-lg border border-gray-100 p-8 w-full max-w-4xl';
+        article.className = 'w-full max-w-4xl mx-auto card p-8';
 
         const title = document.createElement('h1');
-        title.className = 'text-4xl font-bold mb-6 text-blue-800 leading-snug';
+        title.className = 'text-center mb-6';
         title.textContent = pageData.title;
 
+        const htmlContainer = document.createElement('div');
+        htmlContainer.className = 'prose prose-xl max-w-none text-gray-700 leading-relaxed';
+        htmlContainer.innerHTML = pageData.content;
+
         article.appendChild(title);
-        article.appendChild(htmlWrapper);
+        article.appendChild(htmlContainer);
 
         pageContentWrapper.innerHTML = '';
         pageContentWrapper.appendChild(article);
