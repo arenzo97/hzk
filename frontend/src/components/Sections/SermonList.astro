@@ -1,0 +1,84 @@
+---
+// src/components/Sections/SermonList.astro
+import Container from '../components/Layout/Container.astro';
+import Button from '../components/UI/Button.astro';
+
+// Dummy data for demonstration. In a real app, you'd fetch this from an API.
+const sermons = [
+  {
+    id: 1,
+    title: 'The Power of Forgiveness',
+    preacher: 'Pastor John Doe',
+    date: 'July 7, 2025',
+    audioLink: '#',
+    videoLink: '#',
+    link: '/sermons/power-of-forgiveness'
+  },
+  {
+    id: 2,
+    title: 'Walking by Faith',
+    preacher: 'Rev. Jane Smith',
+    date: 'June 30, 2025',
+    audioLink: '#',
+    videoLink: '#',
+    link: '/sermons/walking-by-faith'
+  },
+  {
+    id: 3,
+    title: 'Love Your Neighbor',
+    preacher: 'Guest Speaker Mark Johnson',
+    date: 'June 23, 2025',
+    audioLink: '#',
+    videoLink: '#',
+    link: '/sermons/love-your-neighbor'
+  }
+];
+---
+
+<section class="py-16 bg-white">
+  <Container>
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">Latest Sermons</h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        Listen to recent messages and grow in your faith.
+      </p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {sermons.map(sermon => (
+        <div class="card p-6"> {/* Using the global .card class here */}
+          <h3 class="text-xl font-bold mb-2 text-primary-700">{sermon.title}</h3> {/* Changed to primary-700 for consistency */}
+          <p class="text-gray-600 mb-1"><strong class="text-gray-800">Preacher:</strong> {sermon.preacher}</p>
+          <p class="text-gray-600 mb-4"><strong class="text-gray-800">Date:</strong> {sermon.date}</p>
+          <div class="flex flex-wrap gap-3">
+            {sermon.audioLink && (
+              <a href={sermon.audioLink} class="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium"> {/* Use primary color for links */}
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M9.383 3.081A1 1 0 0110 3v14a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.212zM12.414 7.707a1 1 0 010 1.414L11.707 10l.707.707a1 1 0 01-1.414 1.414L10 11.414l-.707.707a1 1 0 01-1.414-1.414L8.586 10l-.707-.707a1 1 0 011.414-1.414L10 8.586l.707-.707a1 1 0 011.707 0z" clip-rule="evenodd" />
+                </svg>
+                Listen
+              </a>
+            )}
+            {sermon.videoLink && (
+              <a href={sermon.videoLink} class="inline-flex items-center text-red-600 hover:text-red-700 font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3 1h2v2H5V6zm4 0h2v2H9V6zm4 0h2v2h-2V6zM3 13v1h14v-1H3z" />
+                </svg>
+                Watch
+              </a>
+            )}
+            <a href={sermon.link} class="inline-flex items-center text-gray-700 hover:text-gray-900 font-medium">
+              Read Notes →
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-12 text-center">
+      <Button href="/sermons" variant="outline">
+        View All Sermons
+      </Button>
+    </div>
+  </Container>
+</section>

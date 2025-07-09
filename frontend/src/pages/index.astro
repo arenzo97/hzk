@@ -1,0 +1,144 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/Layout/Container.astro';
+import Button from '../components/UI/Button.astro';
+
+const API_URL = 'http://web:80/api/pages';
+
+let homepageContent = null;
+let homepageTitle = null;
+let homepageSubtitle = null;
+let homepageImage = null;
+let ctaText = null;
+let ctaLink = null;
+let secondaryCtaText = null;
+let secondaryCtaLink = null;
+
+try {
+  const response = await fetch(API_URL);
+
+  if (response.ok) {
+    const pages = await response.json();
+    const homepagePage = pages.find(page => page.homepage === true);
+
+    if (homepagePage) {
+      homepageContent = homepagePage.content || null;
+      homepageTitle = homepagePage.title || null;
+      homepageSubtitle = homepagePage.subtitle || null;
+      homepageImage = homepagePage.image || null;
+      ctaText = homepagePage.cta_text || null;
+      ctaLink = homepagePage.cta_link || null;
+      secondaryCtaText = homepagePage.secondary_cta_text || null;
+      secondaryCtaLink = homepagePage.secondary_cta_link || null;
+    } else {
+      homepageContent = null;
+      homepageTitle = null;
+      homepageSubtitle = null;
+      homepageImage = null;
+      ctaText = null;
+      ctaLink = null;
+      secondaryCtaText = null;
+      secondaryCtaLink = null;
+    }
+  } else {
+    console.error(`Failed to fetch pages for index.astro: ${response.status} ${response.statusText}`);
+    homepageContent = null;
+    homepageTitle = null;
+    homepageSubtitle = null;
+    homepageImage = null;
+    ctaText = null;
+    ctaLink = null;
+    secondaryCtaText = null;
+    secondaryCtaLink = null;
+  }
+} catch (error) {
+  console.error('Error fetching homepage content:', error);
+  homepageContent = null;
+  homepageTitle = null;
+  homepageSubtitle = null;
+  homepageImage = null;
+  ctaText = null;
+  ctaLink = null;
+  secondaryCtaText = null;
+  secondaryCtaLink = null;
+}
+---
+
+<BaseLayout title={homepageTitle || 'JLWC Church'} description={homepageSubtitle || 'A welcoming church community.'}>
+  <section
+    class="relative py-32 md:py-48 bg-cover bg-center text-white flex items-center justify-center overflow-hidden"
+    style={`background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${homepageImage || '/uploads/hero-bg.webp'}')`}
+  >
+    <div class="absolute inset-0 bg-dark opacity-20 -z-10"></div>
+    <div class="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4 animate-fade-in-down font-serif">
+        {homepageTitle}
+      </h1>
+      <p class="text-xl md:text-2xl opacity-90 mb-8 animate-fade-in delay-200">
+        {homepageSubtitle}
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 animate-fade-in delay-400">
+        {ctaText && ctaLink && (
+          <Button href={ctaLink} variant="primary" size="lg">
+            {ctaText}
+          </Button>
+        )}
+        {secondaryCtaText && secondaryCtaLink && (
+          <Button
+            href={secondaryCtaLink}
+            variant="outline"
+            size="lg"
+            class="bg-white/10 text-secondary border-secondary hover:bg-secondary hover:text-white backdrop-blur-sm"
+          >
+            {secondaryCtaText}
+          </Button>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16">
+    <Container>
+      {homepageContent ? (
+        <article class="max-w-4xl mx-auto">
+          <div class="prose prose-xl max-w-none text-dark leading-relaxed card p-8">
+            <Fragment set:html={homepageContent} />
+          </div>
+        </article>
+      ) : (
+        <p class="text-center text-primary text-lg">No content to display for the homepage.</p>
+      )}
+    </Container>
+  </section>
+  
+  <style>
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .animate-fade-in-down {
+      animation: fadeInDown 0.8s ease-out forwards;
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-400 { animation-delay: 0.4s; }
+  </style>
+</BaseLayout>
