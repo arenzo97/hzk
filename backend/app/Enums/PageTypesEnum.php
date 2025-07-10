@@ -12,13 +12,14 @@ enum PageTypesEnum: string
 
     case FEATURE = 'feature';
 
-    public function color()
+    public function icon()
     {
         return match($this)
         {
-            self::BASIC => 'info',
-            self::COLLECTION => 'warning',
-            default => 'danger'
+            self::MEDIA => 'heroicon-o-photo',
+            self::COLLECTION => 'heroicon-o-square-3-stack-3d',
+             self::FEATURE => 'heroicon-o-sparkles',
+            default => 'heroicon-o-document-text'
         };
     }
 }

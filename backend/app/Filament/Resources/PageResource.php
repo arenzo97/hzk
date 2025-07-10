@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\PageTypesEnum;
 use App\Filament\Resources\PageResource\Pages;
 use App\Models\Page;
 use Filament\Forms\Components\RichEditor;
@@ -68,14 +69,9 @@ class PageResource extends Resource
             ->reorderable('sort')
             ->defaultSort('sort')
             ->columns([
-                IconColumn::make('homepage')
+                IconColumn::make('type')
                     ->label(false)
-                    ->boolean()
-                    ->trueIcon('heroicon-o-star')
-                    ->falseIcon(false)
-                    ->trueColor('warning')
-                    ->width('w-8')
-                    ->extraAttributes(['class' => 'text-center']),
+                    ->icons(fn () => collect(PageTypesEnum::cases())),
                 TextColumn::make('title')->label('Title')->searchable(),
                 TextColumn::make('slug')->label('Slug')->searchable(),
                 TextColumn::make('author.name')
