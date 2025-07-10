@@ -51,6 +51,13 @@ class PageResource extends Resource
                         true => 'Yes',
                     ])
                     ->default(false),
+                ToggleButtons::make('type')
+                    ->label('Type')
+                    ->boolean()
+                    ->options( collect(PageTypesEnum::cases())->mapWithKeys(function ($case) {
+                        return [$case->value => $case->value];
+                    }))
+                    ->default(false),
                 ToggleButtons::make('published')
                     ->label('Status')
                     ->boolean()
@@ -70,8 +77,7 @@ class PageResource extends Resource
             ->defaultSort('sort')
             ->columns([
                 IconColumn::make('type')
-                    ->label(false)
-                    ->icons(fn () => collect(PageTypesEnum::cases())),
+                    ->icon(fn (string $state): string => PageTypesEnum::from($state)->icon()),
                 TextColumn::make('title')->label('Title')->searchable(),
                 TextColumn::make('slug')->label('Slug')->searchable(),
                 TextColumn::make('author.name')
