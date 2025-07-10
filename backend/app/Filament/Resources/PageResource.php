@@ -3,20 +3,17 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PageResource\Pages;
+use App\Models\Page;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
-use Filament\Tables\Columns\TextColumn;
-use App\Models\Page;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
-use Filament\Tables\Columns\Layout\Stack;
 
 class PageResource extends Resource
 {
@@ -36,7 +33,7 @@ class PageResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->live(onBlur: true)
-                    ->afterStateUpdated(fn($state, callable $set) => $set('slug', Str::slug($state))),
+                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
                 TextInput::make('slug')
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
@@ -50,7 +47,7 @@ class PageResource extends Resource
                     ->grouped()
                     ->options([
                         false => 'No',
-                        true => 'Yes'
+                        true => 'Yes',
                     ])
                     ->default(false),
                 ToggleButtons::make('published')
@@ -59,13 +56,13 @@ class PageResource extends Resource
                     ->grouped()
                     ->options([
                         false => 'Draft',
-                        true => 'Published'
+                        true => 'Published',
                     ])
                     ->default(false),
             ]);
     }
 
-      public static function table(Table $table): Table
+    public static function table(Table $table): Table
     {
         return $table
             ->reorderable('sort')
@@ -110,6 +107,7 @@ class PageResource extends Resource
                 ]),
             ]);
     }
+
     public static function getRelations(): array
     {
         return [

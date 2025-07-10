@@ -43,7 +43,7 @@ const pageDescription = initialPageData?.excerpt || (initialPageData?.content ? 
     <Container>
       {initialPageData ? (
         <article class="w-full max-w-4xl mx-auto card p-8">
-          <h1 class="text-center mb-6">
+          <h1>
             {initialPageData.title}
           </h1>
           <div class="prose prose-xl max-w-none text-gray-700 leading-relaxed">
@@ -88,7 +88,7 @@ const pageDescription = initialPageData?.excerpt || (initialPageData?.content ? 
         article.className = 'w-full max-w-4xl mx-auto card p-8';
 
         const title = document.createElement('h1');
-        title.className = 'text-center mb-6';
+        title.className = 'text-4xl md:text-6xl font-semibold leading-tight text-center mb-6';
         title.textContent = pageData.title;
 
         const htmlContainer = document.createElement('div');

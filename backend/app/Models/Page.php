@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Page extends Model
 {
@@ -21,7 +21,7 @@ class Page extends Model
     ];
 
     protected $casts = [
-        'homepage'  => 'boolean',
+        'homepage' => 'boolean',
         'published' => 'boolean',
     ];
 
@@ -35,7 +35,7 @@ class Page extends Model
 
         static::saving(function (Page $page) {
             if ($page->homepage) {
-                
+
                 Page::where('homepage', true)
                     ->where('id', '!=', $page->id)
                     ->update(['homepage' => false]);

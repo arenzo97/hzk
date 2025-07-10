@@ -46,7 +46,7 @@ class User extends Authenticatable
         ];
     }
 
-     public function canAccessFilament(): bool
+    public function canAccessFilament(): bool
     {
         return true;
     }
