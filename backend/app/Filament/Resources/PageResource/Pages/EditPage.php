@@ -16,7 +16,7 @@ class EditPage extends EditRecord
         return [
 
             Action::make('publish')
-                ->icon('heroicon-o-check-badge')
+                ->icon('heroicon-o-eye')
                 ->color('info')
                 ->action(function ($record, $livewire) {
                     $record->update(['published' => true]);
@@ -26,7 +26,7 @@ class EditPage extends EditRecord
                 ->visible(fn ($record) => $record->published === false),
             Action::make('unpublish')
                 ->label('Set to draft')
-                ->icon('heroicon-o-pencil')
+                ->icon('heroicon-o-eye-slash')
                 ->color('danger')
                 ->action(function ($record, $livewire) {
                     $record->update(['published' => false]);

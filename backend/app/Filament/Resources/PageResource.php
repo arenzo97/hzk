@@ -89,32 +89,31 @@ class PageResource extends Resource
                                         TextInput::make('label')
                                             ->readonly()
                                             ->label(false)
-                                            ->prefixIcon('heroicon-o-pencil-square'),
+                                            ->prefixIcon('heroicon-o-eye'),
                                         TextInput::make('url')
                                             ->readonly()
                                             ->label(false)
                                             ->prefixIcon('heroicon-o-globe-alt'),
                                         TextInput::make('name')
                                             ->live()
-                                            ->label('Link Name (Click Edit to change)')
+                                            ->helperText('Featured link identifier (Click "Edit" to change all fields)')
                                             ->readOnly()
                                             ->default(fn (Get $get) => $get('label') ?? $get('name'))
                                             ->hiddenLabel()
                                             ->suffixAction(
                                                 Action::make('editItemDetails')
-                                                    ->label('Edit Details')
-                                                    ->icon('heroicon-o-arrows-pointing-out')
-                                                    ->color('secondary')
-                                                    ->outlined()
+                                                    ->label('Edit details')
+                                                    ->icon('heroicon-o-pencil')
+                                                    ->color('info')
                                                     ->disabled(fn (string $operation): bool => $operation === 'view')
                                                     ->modalHeading(function (Get $get): string {
-                                                        return 'Edit Featured Link: '.($get('label') ?? $get('name') ?? 'New Link');
+                                                        return 'Edit featured link: '.($get('label') ?? $get('name') ?? 'New Link');
                                                     })
                                                     ->form([
                                                         TextInput::make('name')
                                                             ->required()
                                                             ->maxLength(255)
-                                                            ->label('Internal Name (Admin Only)')
+                                                            ->label('Featured link identifier (admin only)')
                                                             ->helperText('For admin use, to help identify featured links'),
                                                         TextInput::make('label')
                                                             ->nullable()

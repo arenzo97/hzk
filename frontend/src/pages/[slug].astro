@@ -1,4 +1,6 @@
 ---
+// src/pages/[slug].astro
+
 import BasicPageLayout from '../layouts/BasicPageLayout.astro';
 import FeaturePageLayout from '../layouts/FeaturePageLayout.astro';
 import { Fragment } from 'astro/runtime/server/index.js';
@@ -20,8 +22,8 @@ try {
   console.error(`Error fetching page ${slug}:`, error);
 }
 
-const pageTitle = pageData?.title || '404 Page Not Found';
-const pageDescription = pageData?.excerpt || (pageData?.content ? pageData.content.substring(0, 150) + '...' : '');
+const pageTitle = pageData?.title || 'Page Not Found';
+const pageDescription = pageData?.excerpt || (pageData?.content ? pageData.content.substring(0, 150) + '...' : 'Content page from JLWC.');
 
 const layoutMap = {
   'feature': FeaturePageLayout,
@@ -29,7 +31,11 @@ const layoutMap = {
 
 const LayoutComponent = layoutMap[pageData?.type] || BasicPageLayout;
 ---
-<LayoutComponent title={pageTitle} description={pageDescription}>
+<LayoutComponent
+  title={pageTitle}
+  description={pageDescription}
+  pageId={pageData?.id}
+>
   
   {pageData ? (
     <article class="w-full max-w-4xl mx-auto card p-8">
@@ -38,7 +44,7 @@ const LayoutComponent = layoutMap[pageData?.type] || BasicPageLayout;
       </div>
     </article>
   ) : (
-    <p class="text-gray-600 text-lg text-center">Loading content...</p>
+    <p class="text-red-600 text-lg text-center">Page content could not be loaded or was not found.</p>
   )}
 
 </LayoutComponent>
