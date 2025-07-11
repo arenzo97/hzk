@@ -21,8 +21,10 @@ return new class extends Migration
             $table->string('name')
                 ->comment('Internal name for administrators to identify the featured link quickly.');
             $table->text('label')
+                ->nullable()
                 ->comment('The public-facing text or title displayed for the featured link on the frontend.');
             $table->text('url')
+                ->nullable()
                 ->comment('The URL that the featured link points to.');
         });
     }

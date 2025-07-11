@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\PageTypesEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Page extends Model
@@ -49,5 +50,10 @@ class Page extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function featuredLinks(): HasMany
+    {
+        return $this->hasMany(FeaturedLink::class, 'page_id');
     }
 }

@@ -18,27 +18,29 @@ class EditPage extends EditRecord
             Action::make('publish')
                 ->icon('heroicon-o-check-badge')
                 ->color('info')
-                 ->action(function ($record, $livewire) {
+                ->action(function ($record, $livewire) {
                     $record->update(['published' => true]);
+
                     return $livewire->redirect(PageResource::getUrl('index'));
-                })          
-                ->visible(fn($record) => $record->published === false),
+                })
+                ->visible(fn ($record) => $record->published === false),
             Action::make('unpublish')
                 ->label('Set to draft')
                 ->icon('heroicon-o-pencil')
                 ->color('danger')
                 ->action(function ($record, $livewire) {
                     $record->update(['published' => false]);
+
                     return $livewire->redirect(PageResource::getUrl('index'));
-                })          
-                ->visible(fn($record) => $record->published === true),
+                })
+                ->visible(fn ($record) => $record->published === true),
             DeleteAction::make()
                 ->icon('heroicon-o-trash')
                 ->iconButton(),
         ];
     }
 
-        protected function getRedirectUrl(): string
+    protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('view', ['record' => $this->record]);
     }

@@ -5,12 +5,16 @@ namespace App\Filament\Resources;
 use App\Enums\PageTypesEnum;
 use App\Filament\Resources\PageResource\Pages;
 use App\Models\Page;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
@@ -61,6 +65,7 @@ class PageResource extends Resource
                         ToggleButtons::make('type')
                             ->label('Type')
                             ->inline()
+                            ->live()
                             ->icons(collect(PageTypesEnum::cases())->mapWithKeys(function ($case) {
                                 return [$case->value => $case->icon()];
                             }))
@@ -68,6 +73,78 @@ class PageResource extends Resource
                                 return [$case->value => $case->title()];
                             }))
                             ->default(PageTypesEnum::BASIC->value),
+                        Repeater::make('featured_links')
+                            ->relationship('featuredLinks')
+                            ->label('Featured Links')
+                            ->visible(fn (Get $get): bool => $get('type') === PageTypesEnum::FEATURE->value)
+                            ->itemLabel(fn (array $state): ?string => $state['name'] ?? 'New featured link')
+                            ->collapsible()
+                            ->cloneable()
+                            ->reorderable()
+                            ->addable(true)
+                            ->deletable(true)
+                            ->extraItemActions([
+                                Action::make('editItemDetails')
+                                                    ->label('Edit Details')
+                                                    ->icon('heroicon-o-arrows-pointing-out')
+                                                    ->color('secondary')
+                                                    ->outlined()
+                                                    ->disabled(fn (string $operation): bool => $operation === 'view')
+                                                    ->modalHeading(function (Get $get): string {
+                                                        return 'Edit Featured Link: '.($get('label') ?? $get('name') ?? 'New Link');
+                                                    })
+                                                    ->form([
+                                                        TextInput::make('name')
+                                                            ->required()
+                                                            ->maxLength(255)
+                                                            ->label('Internal Name (Admin Only)')
+                                                            ->helperText('For admin use, to help identify featured links'),
+                                                        TextInput::make('label')
+                                                            ->nullable()
+                                                            ->label('Public-Facing Label')
+                                                            ->helperText('Public facing, what users will see on the website for this link'),
+                                                        TextInput::make('url')
+                                                            ->url()
+                                                            ->nullable()
+                                                            ->prefix('https://')
+                                                            ->suffixIcon('heroicon-m-globe-alt')
+                                                            ->label('Link URL'),
+                                                    ])
+                                                    ->fillForm(function (Get $get): array {
+                                                        return [
+                                                            'name' => $get('name'),
+                                                            'label' => $get('label'),
+                                                            'url' => $get('url'),
+                                                        ];
+                                                    })
+                                                    ->action(function (array $data, Set $set): void {
+                                                        $set('name', $data['name']);
+                                                        $set('label', $data['label']);
+                                                        $set('url', $data['url']);
+                                                    })
+                                                    ->slideOver()
+                            ])
+                            ->schema([
+                                Fieldset::make()
+                                    ->schema([
+                                        TextInput::make('label')
+                                            ->readonly()
+                                            ->label(false)
+                                            ->prefixIcon('heroicon-o-pencil-square'),
+                                        TextInput::make('url')
+                                            ->readonly()
+                                            ->label(false)
+                                            ->prefixIcon('heroicon-o-globe-alt'),
+                                        TextInput::make('name')
+                                            ->live()
+                                            ->label('Link Name (Click Edit to change)')
+                                            ->default(fn (Get $get) => $get('label') ?? $get('name'))
+                                            ->hiddenLabel()
+                                            ->columnSpanFull(),
+                                    ]),
+
+                            ]),
+
                     ]),
                 RichEditor::make('content')
                     ->label('Page Content')
@@ -84,9 +161,8 @@ class PageResource extends Resource
             ->defaultSort('sort')
             ->columns([
                 IconColumn::make('type')
-                    ->color(fn ($record): string => $record->homepage === true ? 'primary': '')
-                    ->icon(fn (?PageTypesEnum $state, $record): string =>
-                        $record->homepage === true
+                    ->color(fn ($record): string => $record->homepage === true ? 'primary' : '')
+                    ->icon(fn (?PageTypesEnum $state, $record): string => $record->homepage === true
                             ? 'heroicon-o-star'
                             : ($state?->icon() ?? 'heroicon-o-question-mark-circle')
                     ),
