@@ -9,6 +9,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
@@ -50,12 +51,17 @@ class PageResource extends Resource
                         false => 'No',
                         true => 'Yes',
                     ])
+                    ->live()
                     ->default(false),
                 ToggleButtons::make('type')
+                    ->visible(fn (Get $get) => $get('homepage') == false)
                     ->label('Type')
-                    ->boolean()
-                    ->options( collect(PageTypesEnum::cases())->mapWithKeys(function ($case) {
-                        return [$case->value => $case->value];
+                    ->inline()
+                    ->icons(collect(PageTypesEnum::cases())->mapWithKeys(function ($case) {
+                        return [$case->value => $case->icon()];
+                    }))
+                    ->options(collect(PageTypesEnum::cases())->mapWithKeys(function ($case) {
+                        return [$case->value => $case->title()];
                     }))
                     ->default(false),
                 ToggleButtons::make('published')

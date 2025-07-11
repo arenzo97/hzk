@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use Illuminate\Support\Str;
+
 enum PageTypesEnum: string
 {
     case BASIC = 'basic';
@@ -22,11 +24,16 @@ enum PageTypesEnum: string
         };
     }
 
-     public static function icons(): array
+    public function title(): string
+    {
+        return ucfirst(Str::headline($this->value));
+    }
+
+    public static function icons(): array
     {
         return collect(self::cases())
             ->mapWithKeys(fn (self $enum) => [
-                $enum->value => $enum->icon()
+                $enum->value => $enum->icon(),
             ])
             ->toArray();
     }
