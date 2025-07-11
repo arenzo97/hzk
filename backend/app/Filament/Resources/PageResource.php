@@ -10,6 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Forms\Components\Section;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
@@ -31,49 +32,49 @@ class PageResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('title')
-                    ->required()
-                    ->maxLength(255)
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
-                TextInput::make('slug')
-                    ->maxLength(255)
-                    ->unique(ignoreRecord: true),
+                Section::make('Details')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('title')
+                            ->required()
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
+                        TextInput::make('slug')
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true),
+                        ToggleButtons::make('homepage')
+                            ->label('Homepage')
+                            ->boolean()
+                            ->grouped()
+                            ->options([
+                                false => 'No',
+                                true => 'Yes',
+                            ])
+                            ->live()
+                            ->default(false),
+                    ]),
+                Section::make('Page options')
+                    ->columns(2)
+                    ->visible(fn (Get $get) => $get('homepage') == false)
+                    ->schema([
+                        ToggleButtons::make('type')
+                            ->label('Type')
+                            ->inline()
+                            ->icons(collect(PageTypesEnum::cases())->mapWithKeys(function ($case) {
+                                return [$case->value => $case->icon()];
+                            }))
+                            ->options(collect(PageTypesEnum::cases())->mapWithKeys(function ($case) {
+                                return [$case->value => $case->title()];
+                            }))
+                            ->default(PageTypesEnum::BASIC->value),
+                    ]),
                 RichEditor::make('content')
                     ->label('Page Content')
                     ->fileAttachmentsDirectory('pages')
                     ->fileAttachmentsDisk('public'),
-                ToggleButtons::make('homepage')
-                    ->label('Homepage')
-                    ->boolean()
-                    ->grouped()
-                    ->options([
-                        false => 'No',
-                        true => 'Yes',
-                    ])
-                    ->live()
-                    ->default(false),
-                ToggleButtons::make('type')
-                    ->visible(fn (Get $get) => $get('homepage') == false)
-                    ->label('Type')
-                    ->inline()
-                    ->icons(collect(PageTypesEnum::cases())->mapWithKeys(function ($case) {
-                        return [$case->value => $case->icon()];
-                    }))
-                    ->options(collect(PageTypesEnum::cases())->mapWithKeys(function ($case) {
-                        return [$case->value => $case->title()];
-                    }))
-                    ->default(false),
-                ToggleButtons::make('published')
-                    ->label('Status')
-                    ->boolean()
-                    ->grouped()
-                    ->options([
-                        false => 'Draft',
-                        true => 'Published',
-                    ])
-                    ->default(false),
-            ]);
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
@@ -83,7 +84,8 @@ class PageResource extends Resource
             ->defaultSort('sort')
             ->columns([
                 IconColumn::make('type')
-                    ->icon(fn (string $state): string => PageTypesEnum::from($state)->icon()),
+                    ->color(fn ($record): string => $record->homepage === true ? 'primary': '')
+                    ->icon(fn (string $state, $record): string => $record->homepage === true ? 'heroicon-o-star': PageTypesEnum::from($state)->icon()),
                 TextColumn::make('title')->label('Title')->searchable(),
                 TextColumn::make('slug')->label('Slug')->searchable(),
                 TextColumn::make('author.name')
