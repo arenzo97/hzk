@@ -1,5 +1,4 @@
 ---
-// src/layouts/HomepageLayout.astro
 import BaseLayout from './BaseLayout.astro';
 
 interface Props {
@@ -24,8 +23,6 @@ const { title } = Astro.props;
 </BaseLayout>
 
 <style>
-  /* Important: Add these keyframes to your GLOBAL CSS file (e.g., src/styles.css)
-     if you want them to apply site-wide. If only for this layout, keep them here. */
   @keyframes blob {
     0% { transform: translate(0, 0) scale(1); }
     33% { transform: translate(30px, -50px) scale(1.1); }

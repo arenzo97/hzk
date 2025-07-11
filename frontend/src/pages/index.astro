@@ -1,18 +1,22 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HomepageLayout from '../layouts/HomepageLayout.astro'; // Import HomepageLayout
 import Container from '../components/Layout/Container.astro';
 import Button from '../components/UI/Button.astro';
 
 const API_URL = 'http://web:80/api/pages';
 
+// All fetched variables
 let homepageContent = null;
 let homepageTitle = null;
 let homepageSubtitle = null;
-let homepageImage = null;
+let homepageImage = null; // Used for BaseLayout's hero
 let ctaText = null;
 let ctaLink = null;
 let secondaryCtaText = null;
 let secondaryCtaLink = null;
+
+let isHomepage = false; // Flag to determine which layout to use
 
 try {
   const response = await fetch(API_URL);
@@ -22,6 +26,7 @@ try {
     const homepagePage = pages.find(page => page.homepage === true);
 
     if (homepagePage) {
+      isHomepage = homepagePage.homepage === true; // Set the flag
       homepageContent = homepagePage.content || null;
       homepageTitle = homepagePage.title || null;
       homepageSubtitle = homepagePage.subtitle || null;
@@ -30,52 +35,23 @@ try {
       ctaLink = homepagePage.cta_link || null;
       secondaryCtaText = homepagePage.secondary_cta_text || null;
       secondaryCtaLink = homepagePage.secondary_cta_link || null;
-    } else {
-      homepageContent = null;
-      homepageTitle = null;
-      homepageSubtitle = null;
-      homepageImage = null;
-      ctaText = null;
-      ctaLink = null;
-      secondaryCtaText = null;
-      secondaryCtaLink = null;
     }
   } else {
     console.error(`Failed to fetch pages for index.astro: ${response.status} ${response.statusText}`);
-    homepageContent = null;
-    homepageTitle = null;
-    homepageSubtitle = null;
-    homepageImage = null;
-    ctaText = null;
-    ctaLink = null;
-    secondaryCtaText = null;
-    secondaryCtaLink = null;
   }
 } catch (error) {
   console.error('Error fetching homepage content:', error);
-  homepageContent = null;
-  homepageTitle = null;
-  homepageSubtitle = null;
-  homepageImage = null;
-  ctaText = null;
-  ctaLink = null;
-  secondaryCtaText = null;
-  secondaryCtaLink = null;
 }
 ---
-
-<BaseLayout title={homepageTitle || 'JLWC Church'} description={homepageSubtitle || 'A welcoming church community.'}>
-  <section
-    class="relative py-32 md:py-48 bg-cover bg-center text-white flex items-center justify-center overflow-hidden"
-    style={`background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${homepageImage || '/uploads/hero-bg.webp'}')`}
-  >
-    <div class="absolute inset-0 bg-dark opacity-20 -z-10"></div>
+<HomepageLayout title={homepageTitle}>
+    
+  <Fragment slot="main-content">
     <div class="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
       <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4 animate-fade-in-down font-serif">
         {homepageTitle}
       </h1>
       <p class="text-xl md:text-2xl opacity-90 mb-8 animate-fade-in delay-200">
-        {homepageSubtitle}
+        {homepageSubtitle }
       </p>
       <div class="flex flex-wrap justify-center gap-4 animate-fade-in delay-400">
         {ctaText && ctaLink && (
@@ -95,8 +71,7 @@ try {
         )}
       </div>
     </div>
-  </section>
-
+  </Fragment>
   <section class="py-16">
     <Container>
       {homepageContent ? (
@@ -110,35 +85,19 @@ try {
       )}
     </Container>
   </section>
-  
   <style>
     @keyframes fadeInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-
-    .animate-fade-in-down {
-      animation: fadeInDown 0.8s ease-out forwards;
-    }
-    .animate-fade-in {
-      animation: fadeIn 0.8s ease-out forwards;
-    }
+    .animate-fade-in-down { animation: fadeInDown 0.8s ease-out forwards; }
+    .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
     .delay-200 { animation-delay: 0.2s; }
     .delay-400 { animation-delay: 0.4s; }
   </style>
-</BaseLayout>
+
+  </HomepageLayout>
