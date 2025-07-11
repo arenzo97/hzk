@@ -134,6 +134,7 @@ class PageResource extends Resource
         return [
             'index' => Pages\ListPages::route('/'),
             'create' => Pages\CreatePage::route('/create'),
+            'view' => Pages\ViewPage::route('/{record}'),
             'edit' => Pages\EditPage::route('/{record}/edit'),
         ];
     }
