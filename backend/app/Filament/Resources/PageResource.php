@@ -83,8 +83,25 @@ class PageResource extends Resource
                             ->reorderable()
                             ->addable(true)
                             ->deletable(true)
-                            ->extraItemActions([
-                                Action::make('editItemDetails')
+                            ->schema([
+                                Fieldset::make()
+                                    ->schema([
+                                        TextInput::make('label')
+                                            ->readonly()
+                                            ->label(false)
+                                            ->prefixIcon('heroicon-o-pencil-square'),
+                                        TextInput::make('url')
+                                            ->readonly()
+                                            ->label(false)
+                                            ->prefixIcon('heroicon-o-globe-alt'),
+                                        TextInput::make('name')
+                                            ->live()
+                                            ->label('Link Name (Click Edit to change)')
+                                            ->readOnly()
+                                            ->default(fn (Get $get) => $get('label') ?? $get('name'))
+                                            ->hiddenLabel()
+                                            ->suffixAction(
+                                                Action::make('editItemDetails')
                                                     ->label('Edit Details')
                                                     ->icon('heroicon-o-arrows-pointing-out')
                                                     ->color('secondary')
@@ -123,24 +140,7 @@ class PageResource extends Resource
                                                         $set('url', $data['url']);
                                                     })
                                                     ->slideOver()
-                            ])
-                            ->schema([
-                                Fieldset::make()
-                                    ->schema([
-                                        TextInput::make('label')
-                                            ->readonly()
-                                            ->label(false)
-                                            ->prefixIcon('heroicon-o-pencil-square'),
-                                        TextInput::make('url')
-                                            ->readonly()
-                                            ->label(false)
-                                            ->prefixIcon('heroicon-o-globe-alt'),
-                                        TextInput::make('name')
-                                            ->live()
-                                            ->label('Link Name (Click Edit to change)')
-                                            ->default(fn (Get $get) => $get('label') ?? $get('name'))
-                                            ->hiddenLabel()
-                                            ->columnSpanFull(),
+                                            )->columnSpanFull(),
                                     ]),
 
                             ]),
