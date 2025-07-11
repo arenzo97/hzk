@@ -11,8 +11,8 @@ export default {
         'dark': '#4b1d3fff',          // Violet JTC - Dark backgrounds, main text color, headers/footers
       },
       fontFamily: {
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-        sans: ['"Source Sans Pro"', 'system-ui', 'sans-serif'],
+        sans: ['"SF Pro Display"', '"Helvetica Neue"', 'Segoe UI', 'Roboto', 'sans-serif'], // Your desired sans-serif
+        serif: ['Playfair Display', 'Georgia', 'serif'], // Your desired serif for headings
       },
     },
   },

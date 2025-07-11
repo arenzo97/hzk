@@ -31,11 +31,9 @@ if (typeof pageId === 'number' && !isNaN(pageId)) {
 <BaseLayout title={title} description={description}>
   <div class="feature-page-content-wrapper py-12 px-4 sm:px-6 lg:px-8 min-h-[50vh] flex items-center justify-center font-sans">
     <Container id="dynamic-page-content">
-      <h1 class="text-4xl md:text-6xl font-serif leading-tight text-center mb-10 text-gray-800 drop-shadow-sm">
+      <h1 class="text-4xl md:text-6xl font-serif font-extrabold leading-tight text-center mb-10 text-gray-800 drop-shadow-sm">
         {title}
       </h1>
-
-      {/* Render Featured Links Grid if there are any */}
       {featuredLinks.length > 0 && (
         <div class="featured-links-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 max-w-5xl mx-auto items-center justify-center">
           {featuredLinks.map((link) => (
@@ -64,15 +62,12 @@ if (typeof pageId === 'number' && !isNaN(pageId)) {
 
   <style>
     :root {
-      --primary-color: #007aff; /* Apple Blue for accents (still defined but not used for border hover) */
-      /* Base glass colors as per the example, adjusted for light background */
-      --glass-base-bg: rgba(255, 255, 255, 0.2); /* Slightly more opaque white */
-      --glass-base-border: rgba(255, 255, 255, 0.7); /* Clearer white border */
-      --glass-base-shadow: rgba(31, 38, 135, 0.15); /* Lighter blue tint for shadow */
-      --glass-inset-shadow-light: rgba(255, 255, 255, 0.4); /* Stronger inner light glow */
-
-      /* Subtle liquid shine/specular highlight colors */
-      --liquid-shine-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white for highlight */
+      --primary-color: #007aff;
+      --glass-base-bg: rgba(255, 255, 255, 0.2);
+      --glass-base-border: rgba(255, 255, 255, 0.7);
+      --glass-base-shadow: rgba(31, 38, 135, 0.15);
+      --glass-inset-shadow-light: rgba(255, 255, 255, 0.4);
+      --liquid-shine-color: rgba(255, 255, 255, 0.5);
     }
 
     body {
@@ -80,14 +75,15 @@ if (typeof pageId === 'number' && !isNaN(pageId)) {
       display: flex;
       flex-direction: column;
       color: #333;
-      background-color: #f0f8ff; /* A very light, soft blue (AliceBlue) */
+      background-color: #f0f8ff;
+      /* No font-family here, relies on BaseLayout body class */
     }
 
     .feature-page-content-wrapper {
       flex-grow: 1;
-      font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', sans-serif;
       position: relative;
       overflow: hidden;
+      /* REMOVED: font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', sans-serif; */
     }
 
     .feature-page-content-wrapper h1 {
@@ -95,10 +91,10 @@ if (typeof pageId === 'number' && !isNaN(pageId)) {
       transform: scale(0.9);
       animation: featureTitleScaleUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
       animation-delay: 0.1s;
-      font-family: 'Georgia', 'Palatino Linotype', 'Book Antiqua', 'Palatino', serif;
       will-change: transform, opacity;
       transform: translateZ(0);
       text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      /* REMOVED: font-family: 'Playfair View', serif; */
     }
 
     .featured-links-grid {
@@ -117,7 +113,7 @@ if (typeof pageId === 'number' && !isNaN(pageId)) {
       background: var(--glass-base-bg);
       backdrop-filter: blur(8px) saturate(180%);
       -webkit-backdrop-filter: blur(8px) saturate(180%);
-      border: 1px solid var(--glass-base-border); /* This is the base border color */
+      border: 1px solid var(--glass-base-border);
       border-radius: 2rem;
       box-shadow: 
         0 8px 32px var(--glass-base-shadow),
@@ -130,10 +126,9 @@ if (typeof pageId === 'number' && !isNaN(pageId)) {
     }
 
     .glass-button:hover {
-      /* Removed border-color: var(--primary-color); */
       box-shadow: 
-        0 12px 48px rgba(0, 0, 0, 0.25), /* Deeper outer shadow on hover */
-        inset 0 4px 20px var(--glass-inset-shadow-light); /* Keep inner glow consistent */
+        0 12px 48px rgba(0, 0, 0, 0.25),
+        inset 0 4px 20px var(--glass-inset-shadow-light);
     }
 
     .glass-button::after {
