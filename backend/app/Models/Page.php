@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PageTypesEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,6 +13,7 @@ class Page extends Model
 
     protected $fillable = [
         'title',
+        'type',
         'user_id',
         'sort',
         'slug',
@@ -21,6 +23,7 @@ class Page extends Model
     ];
 
     protected $casts = [
+        'type' => PageTypesEnum::class,
         'homepage' => 'boolean',
         'published' => 'boolean',
     ];

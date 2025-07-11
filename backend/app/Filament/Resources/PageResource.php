@@ -85,7 +85,11 @@ class PageResource extends Resource
             ->columns([
                 IconColumn::make('type')
                     ->color(fn ($record): string => $record->homepage === true ? 'primary': '')
-                    ->icon(fn (string $state, $record): string => $record->homepage === true ? 'heroicon-o-star': PageTypesEnum::from($state)->icon()),
+                    ->icon(fn (?PageTypesEnum $state, $record): string =>
+                        $record->homepage === true
+                            ? 'heroicon-o-star'
+                            : ($state?->icon() ?? 'heroicon-o-question-mark-circle')
+                    ),
                 TextColumn::make('title')->label('Title')->searchable(),
                 TextColumn::make('slug')->label('Slug')->searchable(),
                 TextColumn::make('author.name')
