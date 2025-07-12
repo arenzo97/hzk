@@ -1,22 +1,21 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import HomepageLayout from '../layouts/HomepageLayout.astro'; // Import HomepageLayout
+import HomepageLayout from '../layouts/HomepageLayout.astro';
 import Container from '../components/Layout/Container.astro';
 import Button from '../components/UI/Button.astro';
 
 const API_URL = 'http://web:80/api/pages';
 
-// All fetched variables
 let homepageContent = null;
 let homepageTitle = null;
 let homepageSubtitle = null;
-let homepageImage = null; // Used for BaseLayout's hero
+let homepageImage = null;
 let ctaText = null;
 let ctaLink = null;
 let secondaryCtaText = null;
 let secondaryCtaLink = null;
 
-let isHomepage = false; // Flag to determine which layout to use
+let isHomepage = false;
 
 try {
   const response = await fetch(API_URL);
@@ -26,7 +25,7 @@ try {
     const homepagePage = pages.find(page => page.homepage === true);
 
     if (homepagePage) {
-      isHomepage = homepagePage.homepage === true; // Set the flag
+      isHomepage = homepagePage.homepage === true;
       homepageContent = homepagePage.content || null;
       homepageTitle = homepagePage.title || null;
       homepageSubtitle = homepagePage.subtitle || null;
@@ -47,7 +46,7 @@ try {
     
   <Fragment slot="main-content">
     <div class="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-      <h1 class="text-4xl md:text-6xl font-serif font-extrabold leading-tight text-center mb-10 text-gray-800 drop-shadow-sm animate-fade-in-down">
+      <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 animate-fade-in-down font-serif">
         {homepageTitle}
       </h1>
       <p class="text-xl md:text-2xl opacity-90 mb-8 animate-fade-in delay-200">
@@ -64,7 +63,7 @@ try {
             href={secondaryCtaLink}
             variant="outline"
             size="lg"
-            class="bg-white/10 text-secondary border-secondary hover:bg-secondary hover:text-white backdrop-blur-sm"
+            class="bg-white/10 text-gray-700 border-gray-300 hover:bg-gray-100 hover:text-gray-900 backdrop-blur-sm"
           >
             {secondaryCtaText}
           </Button>
@@ -76,28 +75,17 @@ try {
     <Container>
       {homepageContent ? (
         <article class="max-w-4xl mx-auto">
-          <div class="prose prose-xl max-w-none text-dark leading-relaxed card p-8">
+          <div class="prose prose-xl max-w-none text-gray-800 leading-relaxed card p-8">
             <Fragment set:html={homepageContent} />
           </div>
         </article>
       ) : (
-        <p class="text-center text-primary text-lg">No content to display for the homepage.</p>
+        <p class="text-center text-gray-700 text-lg">No content to display for the homepage.</p>
       )}
     </Container>
   </section>
   <style>
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .animate-fade-in-down { animation: fadeInDown 0.8s ease-out forwards; }
-    .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
-    .delay-200 { animation-delay: 0.2s; }
-    .delay-400 { animation-delay: 0.4s; }
+    
   </style>
 
-  </HomepageLayout>
+</HomepageLayout>

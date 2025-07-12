@@ -1,17 +1,19 @@
 ---
+// src/layouts/FeaturePageLayout.astro
 import BaseLayout from './BaseLayout.astro';
 import Container from '../components/Layout/Container.astro';
 
 interface Props {
   title: string;
   description?: string;
-  pageId?: number; // Ensure pageId is typed as optional number
+  pageId?: number;
 }
 
 const { title, description, pageId } = Astro.props;
 
 let featuredLinks = [];
 
+// Ensure FEATURED_LINKS_API_URL is correctly defined and fetched
 if (typeof pageId === 'number' && !isNaN(pageId)) {
   const FEATURED_LINKS_API_URL = `http://web:80/api/pages/${pageId}/featured`;
 
@@ -31,18 +33,18 @@ if (typeof pageId === 'number' && !isNaN(pageId)) {
 <BaseLayout title={title} description={description}>
   <div class="feature-page-content-wrapper py-12 px-4 sm:px-6 lg:px-8 min-h-[50vh] flex items-center justify-center font-sans">
     <Container id="dynamic-page-content">
-      <h1 class="text-4xl md:text-6xl font-serif font-extrabold leading-tight text-center mb-10 text-gray-800 drop-shadow-sm">
+      <h1 class="text-4xl md:text-6xl font-serif font-black leading-tight text-center mb-10 text-gray-800 drop-shadow-sm">
         {title}
       </h1>
       {featuredLinks.length > 0 && (
-        <div class="featured-links-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 max-w-5xl mx-auto items-center justify-center">
+        <div class="flex flex-wrap justify-center gap-6 mb-12 max-w-5xl mx-auto">
           {featuredLinks.map((link) => (
             <a
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="glass-button relative overflow-hidden flex items-center justify-center px-8 py-5 rounded-3xl shadow-xl backdrop-blur-md transition-all duration-500 ease-out transform hover:scale-105 hover:shadow-2xl"
-            >
+              class="glass-button relative overflow-hidden flex items-center justify-center px-8 py-5 rounded-3xl shadow-xl transition-all duration-500 ease-out transform hover:scale-105 hover:shadow-2xl flex-shrink-0"
+              >
               <span class="relative z-10 text-xl font-semibold text-gray-800 pointer-events-none">{link.label}</span>
             </a>
           ))}
@@ -61,118 +63,18 @@ if (typeof pageId === 'number' && !isNaN(pageId)) {
   </section>
 
   <style>
-    :root {
-      --primary-color: #007aff;
-      --glass-base-bg: rgba(255, 255, 255, 0.2);
-      --glass-base-border: rgba(255, 255, 255, 0.7);
-      --glass-base-shadow: rgba(31, 38, 135, 0.15);
-      --glass-inset-shadow-light: rgba(255, 255, 255, 0.4);
-      --liquid-shine-color: rgba(255, 255, 255, 0.5);
-    }
-
-    body {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      color: #333;
-      background-color: #f0f8ff;
-      /* No font-family here, relies on BaseLayout body class */
-    }
-
-    .feature-page-content-wrapper {
-      flex-grow: 1;
-      position: relative;
-      overflow: hidden;
-      /* REMOVED: font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', sans-serif; */
-    }
-
+    /* Global animations for this layout */
     .feature-page-content-wrapper h1 {
       opacity: 0;
       transform: scale(0.9);
       animation: featureTitleScaleUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
       animation-delay: 0.1s;
       will-change: transform, opacity;
-      transform: translateZ(0);
+      transform: translateZ(0); /* For hardware acceleration */
       text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      /* REMOVED: font-family: 'Playfair View', serif; */
-    }
-
-    .featured-links-grid {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-        gap: 24px;
-    }
-
-    .glass-button {
-      flex: 1 1 auto;
-      max-width: 300px;
-      min-width: 200px;
-      
-      background: var(--glass-base-bg);
-      backdrop-filter: blur(8px) saturate(180%);
-      -webkit-backdrop-filter: blur(8px) saturate(180%);
-      border: 1px solid var(--glass-base-border);
-      border-radius: 2rem;
-      box-shadow: 
-        0 8px 32px var(--glass-base-shadow),
-        inset 0 4px 20px var(--glass-inset-shadow-light);
-      
-      transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-      z-index: 1;
-    }
-
-    .glass-button:hover {
-      box-shadow: 
-        0 12px 48px rgba(0, 0, 0, 0.25),
-        inset 0 4px 20px var(--glass-inset-shadow-light);
-    }
-
-    .glass-button::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: 2rem;
-      background: linear-gradient(
-        215deg,
-        transparent 0%,
-        transparent 30%,
-        var(--liquid-shine-color) 50%,
-        transparent 70%,
-        transparent 100%
-      );
-      opacity: 0;
-      transform: translateX(-100%) translateY(-100%) rotate(45deg);
-      transition: opacity 0.5s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-      z-index: -1;
-    }
-
-    .glass-button:hover::after {
-      opacity: 1;
-      transform: translateX(100%) translateY(100%) rotate(45deg);
     }
     
-    .glass-button:active::after {
-        transition: opacity 0.1s ease-out, transform 0.1s ease-in;
-        opacity: 0.5;
-        transform: translateX(0%) translateY(0%) rotate(45deg);
-    }
-
-    @keyframes featureContentFadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes featureTitleScaleUp {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
+    /* These apply to the <slot /> content, assuming it contains an <article> */
     .feature-page-content-wrapper article {
       opacity: 0;
       transform: translateY(20px);
@@ -182,22 +84,12 @@ if (typeof pageId === 'number' && !isNaN(pageId)) {
       animation: featureContentFadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
       animation-delay: 0.3s;
       will-change: transform, opacity;
-      transform: translateZ(0);
+      transform: translateZ(0); /* For hardware acceleration */
     }
-
-    @keyframes pulseShadow {
-      0% { box-shadow: 0 8px 32px 0 var(--glass-base-shadow), inset 0 4px 20px var(--glass-inset-shadow-light); }
-      50% { box-shadow: 0 10px 38px 0 rgba(31, 38, 135, 0.2), inset 0 4px 20px var(--glass-inset-shadow-light); }
-      100% { box-shadow: 0 8px 32px 0 var(--glass-base-shadow), inset 0 4px 20px var(--glass-inset-shadow-light); }
-    }
-
-    .glass-button:hover {
-      animation: pulseShadow 1.5s infinite alternate;
-    }
-
   </style>
 
   <script>
+    // Client-side script for content animation
     document.addEventListener('astro:load', () => {
       const container = document.getElementById('dynamic-page-content');
       if (!container) return;

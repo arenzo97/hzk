@@ -1,9 +1,20 @@
 /* src/styles.css */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+Pro:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,100;1,100;1,100&display=swap'); /* Updated font import to cover all weights and italics for both fonts */
+
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Define CSS Variables globally if they are not already in tailwind.config.mjs */
+:root {
+  --primary-color: #007aff;
+  --glass-base-bg: rgba(255, 255, 255, 0.2); /* Ensure this alpha value is correct */
+  --glass-base-border: rgba(255, 255, 255, 0.7);
+  --glass-base-shadow: rgba(31, 38, 135, 0.15);
+  --glass-inset-shadow-light: rgba(255, 255, 255, 0.4);
+  --liquid-shine-color: rgba(255, 255, 255, 0.5);
+}
 
 @layer base {
   html {
@@ -12,6 +23,11 @@
   
   body {
     @apply font-sans text-gray-800 bg-gray-50;
+    min-height: 100vh; /* Moved from FeaturePageLayout's local style */
+    display: flex;     /* Moved from FeaturePageLayout's local style */
+    flex-direction: column; /* Moved from FeaturePageLayout's local style */
+    color: #333; /* Already in base, but ensure consistency */
+    background-color: #f0f8ff; /* This background is for FeaturePageLayout. If you want this site-wide, keep it. Otherwise, set it more specifically. I'll assume you want the light blue background site-wide for now as per previous context. */
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -19,7 +35,7 @@
   }
 
   h1 {
-    @apply text-4xl md:text-5xl; /* Adjust for larger hero title if desired, e.g., text-5xl md:text-6xl */
+    @apply text-4xl md:text-5xl;
   }
 
   h2 {
@@ -65,19 +81,97 @@
   }
 
   .btn-outline {
-    @apply text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   }
 
   .card {
     @apply overflow-hidden transition-all bg-white rounded-lg shadow-md hover:shadow-lg;
   }
-}
 
+  .glass-button {
+      background: var(--glass-base-bg); /* Use the transparent variable */
+      backdrop-filter: blur(8px) saturate(180%);
+      -webkit-backdrop-filter: blur(8px) saturate(180%); /* Safari prefix */
+
+      border: 1px solid var(--glass-base-border);
+      border-radius: 2rem;
+      box-shadow: 
+        0 8px 32px var(--glass-base-shadow),
+        inset 0 4px 20px var(--glass-inset-shadow-light);
+      transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+
+      min-width: 200px;
+      max-width: 300px;
+      
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+
+
+  .glass-button:hover {
+    box-shadow: 
+      0 12px 48px rgba(0, 0, 0, 0.25),
+      inset 0 4px 20px var(--glass-inset-shadow-light);
+    animation: pulseShadow 1.5s infinite alternate;
+  }
+
+
+  .glass-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 2rem;
+    background: linear-gradient(
+      215deg,
+      transparent 0%,
+      transparent 30%,
+      var(--liquid-shine-color) 50%,
+      transparent 70%,
+      transparent 100%
+    );
+    opacity: 0;
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    transition: opacity 0.5s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: -1;
+  }
+
+  .glass-button:hover::after {
+    opacity: 1;
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+  
+  .glass-button:active::after {
+      transition: opacity 0.1s ease-out, transform 0.1s ease-in;
+      opacity: 0.5;
+      transform: translateX(0%) translateY(0%) rotate(45deg);
+  }
+
+  .featured-links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      /* gap: 24px; */
+      
+      /* Explicitly center all grid items horizontally within their cells */
+      justify-items: center; 
+
+      justify-content: center; 
+
+  }
+
+} /* End of @layer components */
+
+/* --- Global Utilities/Animations (Moved from various places) --- */
 details > summary::-webkit-details-marker {
   display: none;
 }
 
-/* accordion effect */
 details > summary svg {
   transition: transform 0.2s ease;
 }
@@ -86,7 +180,24 @@ details[open] > summary svg {
   transform: rotate(45deg);
 }
 
-/* Global Animations (from previous context, if you want them here) */
+/* Animations from FeaturePageLayout */
+@keyframes featureTitleScaleUp {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes featureContentFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseShadow {
+  0% { box-shadow: 0 8px 32px 0 var(--glass-base-shadow), inset 0 4px 20px var(--glass-inset-shadow-light); }
+  50% { box-shadow: 0 10px 38px 0 rgba(31, 38, 135, 0.2), inset 0 4px 20px var(--glass-inset-shadow-light); }
+  100% { box-shadow: 0 8px 32px 0 var(--glass-base-shadow), inset 0 4px 20px var(--glass-inset-shadow-light); }
+}
+
+/* Animations from index.astro (homepage) */
 @keyframes fadeInDown {
   from { opacity: 0; transform: translateY(-20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -95,4 +206,11 @@ details[open] > summary svg {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes blob {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0, 0) scale(1); }
 }
