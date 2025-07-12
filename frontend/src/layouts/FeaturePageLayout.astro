@@ -1,0 +1,111 @@
+---
+// src/layouts/FeaturePageLayout.astro
+import BaseLayout from './BaseLayout.astro';
+import Container from '../components/Layout/Container.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  pageId?: number;
+}
+
+const { title, description, pageId } = Astro.props;
+
+let featuredLinks = [];
+
+// Ensure FEATURED_LINKS_API_URL is correctly defined and fetched
+if (typeof pageId === 'number' && !isNaN(pageId)) {
+  const FEATURED_LINKS_API_URL = `http://web:80/api/pages/${pageId}/featured`;
+
+  try {
+    const response = await fetch(FEATURED_LINKS_API_URL);
+    if (response.ok) {
+      featuredLinks = await response.json();
+    } else {
+      console.error(`Failed to fetch featured links for page ID ${pageId}: ${response.status} ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error(`Error fetching featured links for page ID ${pageId}:`, error);
+  }
+}
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="feature-page-content-wrapper py-12 px-4 sm:px-6 lg:px-8 min-h-[50vh] flex items-center justify-center font-sans">
+    <Container id="dynamic-page-content">
+      <h1 class="text-4xl md:text-6xl font-serif font-black leading-tight text-center mb-10 text-gray-800 drop-shadow-sm">
+        {title}
+      </h1>
+      {featuredLinks.length > 0 && (
+        <div class="flex flex-wrap justify-center gap-6 mb-12 max-w-5xl mx-auto">
+          {featuredLinks.map((link) => (
+            <a
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="glass-button relative overflow-hidden flex items-center justify-center px-8 py-5 rounded-3xl shadow-xl transition-all duration-500 ease-out transform hover:scale-105 hover:shadow-2xl flex-shrink-0"
+              >
+              <span class="relative z-10 text-xl font-semibold text-gray-800 pointer-events-none">{link.label}</span>
+            </a>
+          ))}
+        </div>
+      )}
+
+      <slot />
+    </Container>
+  </div>
+
+  <section class="text-center mt-16 mb-8">
+    <a href="/" class="back-home-button inline-flex items-center px-8 py-4 border border-gray-300 shadow-md text-base font-medium rounded-xl text-gray-700 bg-white bg-opacity-80 backdrop-blur-sm hover:bg-gray-100 hover:text-gray-900 transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+      <svg class="h-6 w-6 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H16a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
+      Back to Home
+    </a>
+  </section>
+
+  <style>
+    /* Global animations for this layout */
+    .feature-page-content-wrapper h1 {
+      opacity: 0;
+      transform: scale(0.9);
+      animation: featureTitleScaleUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      animation-delay: 0.1s;
+      will-change: transform, opacity;
+      transform: translateZ(0); /* For hardware acceleration */
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* These apply to the <slot /> content, assuming it contains an <article> */
+    .feature-page-content-wrapper article {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .feature-page-content-wrapper .animate-article-content {
+      animation: featureContentFadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      animation-delay: 0.3s;
+      will-change: transform, opacity;
+      transform: translateZ(0); /* For hardware acceleration */
+    }
+  </style>
+
+  <script>
+    // Client-side script for content animation
+    document.addEventListener('astro:load', () => {
+      const container = document.getElementById('dynamic-page-content');
+      if (!container) return;
+
+      const applyAnimation = (element) => {
+        if (element && element.offsetParent !== null) {
+          setTimeout(() => {
+            element.classList.add('animate-article-content');
+          }, 100);
+        }
+      };
+
+      const slottedArticle = container.querySelector('article');
+      if (slottedArticle) {
+        applyAnimation(slottedArticle);
+      }
+    });
+  </script>
+</BaseLayout>

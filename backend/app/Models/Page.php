@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\PageTypesEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Page extends Model
 {
@@ -12,6 +14,7 @@ class Page extends Model
 
     protected $fillable = [
         'title',
+        'type',
         'user_id',
         'sort',
         'slug',
@@ -21,7 +24,8 @@ class Page extends Model
     ];
 
     protected $casts = [
-        'homepage'  => 'boolean',
+        'type' => PageTypesEnum::class,
+        'homepage' => 'boolean',
         'published' => 'boolean',
     ];
 
@@ -35,7 +39,7 @@ class Page extends Model
 
         static::saving(function (Page $page) {
             if ($page->homepage) {
-                
+
                 Page::where('homepage', true)
                     ->where('id', '!=', $page->id)
                     ->update(['homepage' => false]);
@@ -46,5 +50,10 @@ class Page extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function featuredLinks(): HasMany
+    {
+        return $this->hasMany(FeaturedLink::class, 'page_id');
     }
 }

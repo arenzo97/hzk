@@ -1,0 +1,28 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Container from '../components/Layout/Container.astro'; // Assuming you'll use Container
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="basic-page-content-wrapper py-12 px-4 sm:px-6 lg:px-8 min-h-[50vh] flex flex-col items-center justify-center font-sans">
+    <Container>
+      <h1 class="text-4xl md:text-6xl font-serif font-black leading-tight text-center mb-10 text-gray-800 drop-shadow-sm">
+        {title}
+      </h1>
+      <slot />
+    </Container>
+  </div>
+</BaseLayout>
+
+<style>
+  .basic-page-content-wrapper {
+    flex-grow: 1; /* Allows it to take up remaining space */
+  }
+</style>
