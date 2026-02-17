@@ -9,13 +9,13 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-     public function up(): void
+    public function up(): void
     {
         Schema::create('collectables', function (Blueprint $table) {
             $table->id();
             $table->foreignId('collection_id')
-                  ->constrained('collections')
-                  ->onDelete('cascade');
+                ->constrained('collections')
+                ->onDelete('cascade');
             $table->morphs('collectable');
             $table->unique(['collection_id', 'collectable_id', 'collectable_type'], 'collectable_unique');
             $table->timestamps();

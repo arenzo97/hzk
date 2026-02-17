@@ -2,14 +2,14 @@
 
 namespace App\Filament\Resources\PageResource\RelationManagers;
 
+use App\Enums\PageTypesEnum;
+use Filament\Forms\Components\Textarea; // <--- v4 Requirement
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema; // <--- v4 Requirement
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Illuminate\Support\Str;
-use App\Enums\PageTypesEnum;
 
 class CollectionsRelationManager extends RelationManager
 {
@@ -29,11 +29,11 @@ class CollectionsRelationManager extends RelationManager
                     ->maxLength(255)
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
-                
+
                 TextInput::make('slug')
                     ->required()
                     ->maxLength(255),
-                
+
                 Textarea::make('description')
                     ->columnSpanFull(),
             ]);
