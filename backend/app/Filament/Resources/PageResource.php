@@ -7,21 +7,26 @@ use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\PageResource\RelationManagers\CollectionsRelationManager;
 use App\Models\Page;
 use BackedEnum;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Fieldset;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Schemas\Components\Fieldset;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
-use Filament\Schemas\Schema;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use UnitEnum;
 
@@ -29,13 +34,13 @@ class PageResource extends Resource
 {
     protected static ?string $model = Page::class;
 
-    protected static string | UnitEnum | null $navigationGroup = 'Website';
+    protected static string|UnitEnum|null $navigationGroup = 'Website';
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-book-open';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
 
     protected static ?string $navigationLabel = 'Pages';
 
-    public static function schema(Schema $schema): Schema
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -47,11 +52,11 @@ class PageResource extends Resource
                             ->maxLength(255)
                             ->live(onBlur: true)
                             ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
-                        
+
                         TextInput::make('slug')
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
-                        
+
                         ToggleButtons::make('homepage')
                             ->label('Homepage')
                             ->boolean()
@@ -149,7 +154,7 @@ class PageResource extends Resource
                     ]),
 
                 RichEditor::make('content')
-                    ->label(fn(Get $get) => $get('type') === PageTypesEnum::COLLECTION->value ? 'Collection Intro Text' : 'Page Content')
+                    ->label(fn (Get $get) => $get('type') === PageTypesEnum::COLLECTION->value ? 'Collection Intro Text' : 'Page Content')
                     ->fileAttachmentsDirectory('pages')
                     ->fileAttachmentsDisk('public'),
             ])
@@ -165,8 +170,8 @@ class PageResource extends Resource
                 IconColumn::make('type')
                     ->color(fn ($record): string => $record->homepage === true ? 'primary' : '')
                     ->icon(fn (?PageTypesEnum $state, $record): string => $record->homepage === true
-                            ? 'heroicon-o-star'
-                            : ($state?->icon() ?? 'heroicon-o-question-mark-circle')
+                        ? 'heroicon-o-star'
+                        : ($state?->icon() ?? 'heroicon-o-question-mark-circle')
                     ),
                 TextColumn::make('title')->label('Title')->searchable(),
                 TextColumn::make('slug')->label('Slug')->searchable(),
@@ -187,20 +192,20 @@ class PageResource extends Resource
                     ->dateTime('M j, Y H:i'),
             ])
             ->recordActions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                BulkAction::make('delete')
+                    ->requiresConfirmation()
+                    ->action(fn (Collection $records) => $records->each->delete()),
             ]);
     }
 
     public static function getRelations(): array
     {
         return [
-            CollectionsRelationManager::class,
+            // CollectionsRelationManager::class,
         ];
     }
 
