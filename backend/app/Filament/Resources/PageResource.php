@@ -4,37 +4,43 @@ namespace App\Filament\Resources;
 
 use App\Enums\PageTypesEnum;
 use App\Filament\Resources\PageResource\Pages;
+use App\Filament\Resources\PageResource\RelationManagers\CollectionsRelationManager;
 use App\Models\Page;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Fieldset;
+use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class PageResource extends Resource
 {
     protected static ?string $model = Page::class;
 
-    protected static ?string $navigationGroup = 'Website';
+    protected static string|UnitEnum|null $navigationGroup = 'Website';
 
-    protected static ?string $navigationIcon = 'heroicon-o-book-open';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
 
     protected static ?string $navigationLabel = 'Pages';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make('Details')
                     ->columns(2)
@@ -44,9 +50,11 @@ class PageResource extends Resource
                             ->maxLength(255)
                             ->live(onBlur: true)
                             ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
+
                         TextInput::make('slug')
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
+
                         ToggleButtons::make('homepage')
                             ->label('Homepage')
                             ->boolean()
@@ -58,6 +66,7 @@ class PageResource extends Resource
                             ->live()
                             ->default(false),
                     ]),
+
                 Section::make('Page options')
                     ->columns(2)
                     ->visible(fn (Get $get) => $get('homepage') == false)
@@ -73,6 +82,7 @@ class PageResource extends Resource
                                 return [$case->value => $case->title()];
                             }))
                             ->default(PageTypesEnum::BASIC->value),
+
                         Repeater::make('featured_links')
                             ->relationship('featuredLinks')
                             ->label('Featured Links')
@@ -113,18 +123,15 @@ class PageResource extends Resource
                                                         TextInput::make('name')
                                                             ->required()
                                                             ->maxLength(255)
-                                                            ->label('Featured link identifier (admin only)')
-                                                            ->helperText('For admin use, to help identify featured links'),
+                                                            ->label('Identifier (Admin)'),
                                                         TextInput::make('label')
                                                             ->nullable()
-                                                            ->label('Public-Facing Label')
-                                                            ->helperText('Public facing, what users will see on the website for this link'),
+                                                            ->label('Public Label'),
                                                         TextInput::make('url')
                                                             ->url()
                                                             ->nullable()
                                                             ->prefix('https://')
-                                                            ->suffixIcon('heroicon-m-globe-alt')
-                                                            ->label('Link URL'),
+                                                            ->label('URL'),
                                                     ])
                                                     ->fillForm(function (Get $get): array {
                                                         return [
@@ -141,12 +148,11 @@ class PageResource extends Resource
                                                     ->slideOver()
                                             )->columnSpanFull(),
                                     ]),
-
                             ]),
-
                     ]),
+
                 RichEditor::make('content')
-                    ->label('Page Content')
+                    ->label(fn (Get $get) => $get('type') === PageTypesEnum::COLLECTION->value ? 'Collection Intro Text' : 'Page Content')
                     ->fileAttachmentsDirectory('pages')
                     ->fileAttachmentsDisk('public'),
             ])
@@ -162,8 +168,8 @@ class PageResource extends Resource
                 IconColumn::make('type')
                     ->color(fn ($record): string => $record->homepage === true ? 'primary' : '')
                     ->icon(fn (?PageTypesEnum $state, $record): string => $record->homepage === true
-                            ? 'heroicon-o-star'
-                            : ($state?->icon() ?? 'heroicon-o-question-mark-circle')
+                        ? 'heroicon-o-star'
+                        : ($state?->icon() ?? 'heroicon-o-question-mark-circle')
                     ),
                 TextColumn::make('title')->label('Title')->searchable(),
                 TextColumn::make('slug')->label('Slug')->searchable(),
@@ -183,24 +189,21 @@ class PageResource extends Resource
                     ->label('Created')
                     ->dateTime('M j, Y H:i'),
             ])
-            ->filters([
-                //
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+            ->toolbarActions([
+                BulkAction::make('delete')
+                    ->requiresConfirmation()
+                    ->action(fn (Collection $records) => $records->each->delete()),
             ]);
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            // CollectionsRelationManager::class,
         ];
     }
 

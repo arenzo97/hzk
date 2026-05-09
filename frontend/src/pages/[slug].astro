@@ -39,7 +39,7 @@ const LayoutComponent = layoutMap[pageData?.type] || BasicPageLayout;
   
   {pageData ? (
     <article class="w-full max-w-4xl mx-auto card p-8">
-      <div class="prose prose-xl max-w-none text-gray-700 leading-relaxed">
+      <div class="prose prose-xl max-w-none text-gray-700 leading-relaxed animate-fade-in delay-200">
         <Fragment set:html={pageData.content} />
       </div>
     </article>

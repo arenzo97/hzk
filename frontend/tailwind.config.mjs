@@ -50,6 +50,7 @@ export default {
       animation: {
         'fade-in': 'fadeIn 1s ease-out forwards',
         'fade-in-down': 'fadeInDown 0.8s ease-out forwards',
+        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
         'blob': 'blob 7s infinite cubic-bezier(0.68, -0.55, 0.27, 1.55)', // Match your desired blob animation
         'pulseShadow': 'pulseShadow 1.5s infinite alternate',
         'featureTitleScaleUp': 'featureTitleScaleUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
