@@ -10,7 +10,7 @@ class PageController extends Controller
     public function index()
     {
         return Page::where('published', true)
-            ->with('author:id,name') // Include author info
+            ->with('author:id,first_name,last_name') // Include author info
             ->orderBy('sort')
             ->get();
     }
@@ -19,7 +19,7 @@ class PageController extends Controller
     {
         return Page::where('slug', $slug)
             ->where('published', true)
-            ->with('author:id,name')
+            ->with('author:id,first_name,last_name')
             ->firstOrFail();
     }
 }
