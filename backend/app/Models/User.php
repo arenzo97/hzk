@@ -18,12 +18,12 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
+   protected $fillable = [
+        'first_name',
+        'last_name',
         'email',
         'password',
     ];
-
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -50,5 +50,12 @@ class User extends Authenticatable
     public function canAccessFilament(): bool
     {
         return true;
+    }
+
+    protected function name(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn (mixed $value, array $attributes) => "{$attributes['first_name']} {$attributes['last_name']}",
+        );
     }
 }

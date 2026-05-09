@@ -28,6 +28,9 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('Website'),
+                NavigationGroup::make()
+                    ->label('Settings'),
+                    
             ])
             ->brandName('JLWC')
             ->default()
